@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="850" viewBox="0 0 1600 850" role="img" aria-label="CT-VAM teaser placeholder">
+  <rect width="1600" height="850" fill="#f6f6f6"/>
+  <rect x="60" y="60" width="1480" height="730" rx="36" fill="#ffffff" stroke="#dddddd" stroke-width="4"/>
+  <text x="800" y="385" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700" fill="#8c1515">CT-VAM Teaser</text>
+  <text x="800" y="470" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="34" fill="#666666">Replace with teaser image or video</text>
+</svg>

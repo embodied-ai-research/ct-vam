@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CT-VAM: A Cerebello-Thalamic-Inspired Vision-Action Model for Efficient Visuomotor Control" />
+  <meta property="og:title" content="CT-VAM" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://embodied-ai-research.github.io/ct-vam/" />
+  <meta property="og:description" content="A Cerebello-Thalamic-Inspired Vision-Action Model for Efficient Visuomotor Control" />
+  <title>CT-VAM</title>
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <p class="tagline">CoRL 2026 Conference Submission</p>
+      <h1>CT-VAM</h1>
+      <h2>A Cerebello-Thalamic-Inspired Vision-Action Model for Efficient Visuomotor Control</h2>
+
+      <p class="authors">
+        <span>Jiacheng Li<sup>*</sup></span>,
+        <span>Yize Guo<sup>*</sup></span>,
+        <span>Jiabin Guo<sup>*</sup></span>,
+        <span>Qingchen Liu</span>,
+        <span>Jiahu Qin</span>
+      </p>
+      <p class="affiliations">AIRLab, University of Science and Technology of China</p>
+      <p class="equal-contribution"><sup>*</sup>Equal contribution</p>
+
+      <div class="button-row" aria-label="project links">
+        <button class="button button-disabled" type="button" disabled>Paper <span>(coming soon)</span></button>
+        <button class="button button-disabled" type="button" disabled>Code <span>(coming soon)</span></button>
+        <button class="button button-disabled" type="button" disabled>Video <span>(coming soon)</span></button>
+      </div>
+    </header>
+
+    <section class="section teaser-section" id="overview">
+      <div class="figure-card hero-figure">
+        <img src="assets/images/overview.png" alt="Overview of CT-VAM" />
+      </div>
+      <p class="caption">
+        Overview of CT-VAM: parameter--performance comparison on LIBERO, CT-VAM architecture, and real-world deployment. The dashed high-level decision module indicates a compatible upstream module for future integration, but it is not introduced or evaluated in this work.
+      </p>
+    </section>
+
+    <section class="section" id="abstract">
+      <h2>Abstract</h2>
+      <p>
+        Vision-language-action models have shown strong promise for robot manipulation, yet raw language is primarily needed to specify task intent rather than to be repeatedly processed during high-frequency low-level execution. Motivated by this separation, we propose a cerebello-thalamic-inspired vision-action model (CT-VAM) for efficient task-conditioned visuomotor control. CT-VAM acts as a compact local execution policy that predicts action chunks from dual-view visual observations, proprioception, and a lightweight task condition, potentially enabling a practical cloud-edge paradigm in which high-level semantic reasoning can be handled by large models while fast closed-loop control runs on local hardware. To fuse heterogeneous inputs effectively, CT-VAM introduces TARS (Thalamic Action Routing Stream), a stream-separated conditional attention decoder that independently routes action, visual and task streams, preventing dense sensory tokens from overwhelming compact task-relevant conditions. With only 68M parameters, CT-VAM achieves LIBERO success rates competitive with substantially larger VLA models, while reducing inference latency. Together with flow-consistent inpainting for asynchronous chunk execution, CT-VAM supports high-frequency control and demonstrates robust real-world deployment on resource-constrained robotic platforms.
+      </p>
+    </section>
+
+    <section class="section" id="contributions">
+      <h2>Highlights</h2>
+      <div class="cards three-cards">
+        <article class="text-card">
+          <h3>Grounded visuomotor execution</h3>
+          <p>CT-VAM separates semantic language grounding from high-frequency visual feedback control. Raw language is converted into an intent representation, while the low-level policy uses visual-proprioceptive observations for closed-loop action generation.</p>
+        </article>
+        <article class="text-card">
+          <h3>TARS</h3>
+          <p>TARS is a stream-separated conditional attention module that routes and gates action, visual, proprioceptive, and task streams, preventing dense visual tokens from overwhelming compact but task-relevant conditions.</p>
+        </article>
+        <article class="text-card">
+          <h3>Flow-consistent inpainting</h3>
+          <p>Flow-consistent inpainting enables next-chunk inference to overlap with current execution while preserving action continuity, supporting efficient real-world deployment on Jetson Orin NX.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="method">
+      <h2>Method Overview</h2>
+      <p>
+        CT-VAM targets low-level visuomotor execution and is designed for efficient closed-loop, onboard deployment. Given dual-view visual observations, proprioception, and the task condition, CT-VAM predicts action chunks for closed-loop execution.
+      </p>
+      <div class="figure-card">
+        <img src="assets/images/tars-framework.png" alt="TARS framework" />
+      </div>
+      <p class="caption">
+        TARS routes heterogeneous action, visual, proprioceptive, and task streams through a stream-separated conditional attention decoder.
+      </p>
+    </section>
+
+    <section class="section" id="fci">
+      <h2>Flow-Consistent Inpainting</h2>
+      <p>
+        Although a compact model reduces per-chunk inference latency, real-time manipulation still requires careful execution scheduling. Flow-consistent inpainting supports asynchronous chunk execution by decoding the next action chunk while the current chunk is being executed and constraining the overlap region to preserve action continuity.
+      </p>
+      <div class="figure-card">
+        <img src="assets/images/flow-consistent-inpainting.png" alt="Flow-consistent inpainting" />
+      </div>
+    </section>
+
+    <section class="section" id="libero">
+      <h2>LIBERO Benchmark</h2>
+      <p>
+        CT-VAM is evaluated on LIBERO-Spatial, LIBERO-Object, LIBERO-Goal, and LIBERO-Long. The policy takes two visual observations, proprioceptive states, and a one-hot task identifier as input, without invoking a large VLM during low-level execution.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Params</th>
+              <th>Spatial</th>
+              <th>Object</th>
+              <th>Goal</th>
+              <th>Long</th>
+              <th>Avg.</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="group-row"><td colspan="7">Policy With VLM</td></tr>
+            <tr><td>OpenVLA</td><td>7000M</td><td>84.7</td><td>88.4</td><td>79.2</td><td>53.7</td><td>76.5</td></tr>
+            <tr><td>SpatialVLA</td><td>4000M</td><td>88.2</td><td>89.9</td><td>78.6</td><td>55.5</td><td>78.1</td></tr>
+            <tr><td>&pi;<sub>0</sub>-FAST</td><td>3300M</td><td>96.4</td><td>96.8</td><td>88.6</td><td>60.2</td><td>85.5</td></tr>
+            <tr><td>&pi;<sub>0</sub></td><td>3300M</td><td>90.0</td><td>86.0</td><td>95.0</td><td>73.0</td><td>86.0</td></tr>
+            <tr class="group-row"><td colspan="7">Policy Without VLM</td></tr>
+            <tr><td>Diffusion Policy</td><td>--</td><td>78.3</td><td>92.5</td><td>68.3</td><td>50.5</td><td>72.4</td></tr>
+            <tr><td>MDT</td><td>~225M</td><td>78.5</td><td>87.5</td><td>73.5</td><td>64.8</td><td>76.1</td></tr>
+            <tr class="highlight"><td><strong>CT-VAM (Ours)</strong></td><td><strong>68M</strong></td><td><strong>89.0</strong></td><td><strong>94.6</strong></td><td><strong>78.4</strong></td><td><strong>66.2</strong></td><td><strong>82.1</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        With only 68M parameters, CT-VAM achieves competitive overall performance and outperforms existing non-VLM baselines on average, while remaining much smaller than billion-scale VLM policies.
+      </p>
+    </section>
+
+    <section class="section" id="real-world">
+      <h2>Real-World Experiments</h2>
+      <p>
+        CT-VAM is evaluated on two real-world tabletop manipulation tasks. Ball Pouring is used for quantitative comparison with baseline methods and ablated variants, while Box Opening and Placement is used to examine long-horizon task-conditioned execution under subtask switching.
+      </p>
+      <div class="figure-card">
+        <img src="assets/images/real-world-setup.png" alt="Real-world experimental setup and task workflow" />
+      </div>
+      <p class="caption">
+        Real-world experimental setup and task workflow: OpenArm platform, inference devices including Jetson Orin NX and NVIDIA RTX 4080, and representative execution sequences.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th rowspan="2">Method</th>
+              <th colspan="3">RTX 4080</th>
+              <th colspan="3">Jetson Orin NX</th>
+            </tr>
+            <tr>
+              <th>Success (%) ↑</th><th>Exec. Time (s) ↓</th><th>Infer. Time (ms) ↓</th>
+              <th>Success (%) ↑</th><th>Exec. Time (s) ↓</th><th>Infer. Time (ms) ↓</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Diffusion Policy</td><td>70.0</td><td>27.21</td><td>303.27</td><td>N.T.</td><td>N.T.</td><td>N.T.</td></tr>
+            <tr><td>&pi;<sub>0</sub></td><td>95.0</td><td>7.82</td><td>117.24</td><td>N.D.</td><td>N.D.</td><td>N.D.</td></tr>
+            <tr><td>CT-VAM w/o FCI</td><td><strong>100</strong></td><td>8.33</td><td><strong>56.32</strong></td><td>85</td><td>10.24</td><td>256.24</td></tr>
+            <tr class="highlight"><td><strong>CT-VAM w/ FCI</strong></td><td>95</td><td><strong>6.41</strong></td><td>56.84</td><td><strong>90</strong></td><td><strong>7.23</strong></td><td><strong>200.60</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">N.T. indicates that the method was not tested on Jetson Orin NX. N.D. indicates that the method could not be deployed due to memory constraints.</p>
+    </section>
+
+    <section class="section" id="tasks">
+      <h2>Task Visualizations</h2>
+      <div class="split-grid">
+        <div>
+          <div class="figure-card"><img src="assets/images/ball-pouring.png" alt="Ball pouring task key frames" /></div>
+          <p class="caption">Ball pouring task: the robot grasps a bottle, adjusts its pose, and pours the contained balls into the target tray.</p>
+        </div>
+        <div>
+          <div class="figure-card"><img src="assets/images/box-task.png" alt="Box opening and placement task key frames" /></div>
+          <p class="caption">Box opening and placement task: the task is divided into three manually labeled subtasks during data collection and evaluation.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <h2>FAQ</h2>
+      <div class="faq-item">
+        <h3>Why does the current implementation use one-hot task tokens instead of raw language instructions?</h3>
+        <p>
+          The current one-hot design is used to isolate the evaluation of the low-level visuomotor policy. In this setting, the compact task token provides the task intent, while CT-VAM can be tested for whether it can perform closed-loop visual-proprioceptive action generation under a given intent. This allows the current experiments to focus on the capability of the lower-level execution module, rather than mixing it with the quality of an upstream language grounding module. In future work, this one-hot task representation will be replaced by a more complete language-to-intent encoding module that maps raw instructions and scene context into task-relevant intent representations.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" id="bibtex">
+      <h2>BibTeX</h2>
+      <div class="coming-box">Coming soon. The citation will be updated after the arXiv version is available.</div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>CT-VAM project page. Last updated: 2026.</p>
+  </footer>
+</body>
+</html>
