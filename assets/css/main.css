@@ -81,6 +81,7 @@ body {
   font-weight: 800;
   border: 1px solid var(--accent);
   font-size: 0.98rem;
+  text-decoration: none;
 }
 .button span { font-weight: 600; opacity: 0.88; }
 .button-disabled {
