@@ -132,6 +132,12 @@ body {
   width: 100%;
   height: auto;
 }
+.figure-card video {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #000;
+}
 .hero-figure { border-radius: 18px; }
 .caption {
   margin-top: 10px !important;
@@ -189,6 +195,7 @@ tr:last-child td { border-bottom: 0; }
   gap: 18px;
   align-items: start;
 }
+.video-grid { margin-top: 10px; }
 
 .faq-item {
   border: 1px solid var(--border);
